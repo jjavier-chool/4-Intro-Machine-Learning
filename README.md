@@ -2,7 +2,10 @@
 The fourth assignment for CS429.
 
 ## TODO:
-- Tasks 1-x.
+- Task 2
+- Task 3: loss figure, time cost of learning, training & test errors
+- Task 4: loss figure, time cost of learning, training & test errors, test accuracy >= 95%.
+- Task 5: loss figure, time cost of learning, training & test errors, test accuracy >= 95%.
 - Report on Overleaf
 
 ## How to Run
@@ -20,7 +23,7 @@ It may be necessary to downgrade numpy or test in a separate environment with nu
 Environment method I used:
 ```console
 python3 -m venv assign4-env
-source assign3-env/bin/activate
+source assign4-env/bin/activate
 pip install -r requirements.txt
 ```
 Deactive with:
