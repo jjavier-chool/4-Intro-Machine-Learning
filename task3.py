@@ -19,6 +19,7 @@ BATCH_SIZE = 32
 EPOCHS = 30
 LEARNING_RATE = 0.001
 HIDDEN_SIZE = 64
+NUM_LAYERS = 1
 
 # Accuracy calc (should be safer?)
 def compute_accuracy(y_pred, y_true):
@@ -116,7 +117,7 @@ def plot_predictions(y_true, y_pred, stock_name):
   plt.legend()
   plt.savefig("pred_" + stock_name + ".png")
 
-def train_eval(Model, hidden_size, lr):
+def train_eval(Model, hidden_size, num_layers, lr):
   datasets = get_datasets()
 
   results = {}
@@ -124,7 +125,7 @@ def train_eval(Model, hidden_size, lr):
   for name, stock in datasets.items():
     print(f"\nTraining RNN for {name}...")
 
-    model = Model(input_size=1, hidden_size=hidden_size, output_size=1)
+    model = Model(input_size=1, hidden_size=hidden_size, num_layers=num_layers, output_size=1)
     res = train_model(model, stock, lr)
 
     results[name] = res
@@ -144,7 +145,7 @@ def train_eval(Model, hidden_size, lr):
 
 def main():
   torch.manual_seed(42)
-  train_eval(RNNModel, HIDDEN_SIZE, LEARNING_RATE)
+  train_eval(RNNModel, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
 
 if __name__ == "__main__":
   main()

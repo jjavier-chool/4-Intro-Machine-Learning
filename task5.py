@@ -1,6 +1,6 @@
 """
 Intro Machine Learning Assignment 4
-Encompasses the solution to Task 4.
+Encompasses the solution to Task 5.
 Code is adopted and modified from the class slides.
 Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
 """
@@ -13,9 +13,9 @@ LEARNING_RATE = 0.001
 HIDDEN_SIZE = 64
 NUM_LAYERS = 1
 
-class GRUModel(nn.Module):
+class LSTMModel(nn.Module):
   def __init__(self, input_size, hidden_size, output_size, num_layers):
-    super(GRUModel, self).__init__()
+    super(LSTMModel, self).__init__()
 
     self.rnn = nn.GRU(input_size, hidden_size, num_layers=num_layers, batch_first=True)
     self.h2o = nn.Linear(hidden_size, output_size)
@@ -29,7 +29,7 @@ class GRUModel(nn.Module):
 
 def main():
   torch.manual_seed(42)
-  train_eval(GRUModel, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
+  train_eval(LSTMModel, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
 
 if __name__ == "__main__":
   main()

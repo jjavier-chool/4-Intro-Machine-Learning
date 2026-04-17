@@ -8,10 +8,10 @@ import torch
 import torch.nn as nn
 
 class RNNModel(nn.Module):
-  def __init__(self, input_size, hidden_size, output_size):
+  def __init__(self, input_size, hidden_size, output_size, num_layers):
     super(RNNModel, self).__init__()
 
-    self.rnn = nn.RNN(input_size, hidden_size, num_layers=1, batch_first=True)
+    self.rnn = nn.RNN(input_size, hidden_size, num_layers=num_layers, batch_first=True)
     self.h2o = nn.Linear(hidden_size, output_size)
     # self.softmax = nn.LogSoftmax(dim=1) ignore for regression
 
