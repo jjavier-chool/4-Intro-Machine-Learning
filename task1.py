@@ -1,3 +1,4 @@
+from torch.utils.data import TensorDataset
 import yfinance as yf
 import numpy as np
 import torch
@@ -20,15 +21,13 @@ N = 1   # number of future days to predict
 TEST_SIZE = 0.2
 RANDOM_STATE = 42
 
-main = False
-
 # Download the data
-def download_stock_data(stock):
+def download_stock_data(stock: str):
   data = yf.download(stock, start=START_DATE, end=END_DATE)
   return data['Close'].values.reshape(-1, 1)
 
 # Convert time series into supervised learning format
-def create_sequences(data, M, N):
+def create_sequences(data, M: int, N: int):
   """
   X: past M days
   y: next N days
@@ -42,7 +41,7 @@ def create_sequences(data, M, N):
   return np.array(X), np.array(y)
 
 # Preprocess + split
-def prepare_data(stock):
+def prepare_data(stock: str):
   # Download
   raw_data = download_stock_data(stock)
 
@@ -69,34 +68,40 @@ def prepare_data(stock):
 
   return X_train, X_test, y_train, y_test, scaler
 
-def get_datasets():
-  datasets = {}
+class Stock:
+  def __init__(self, name: str):
+    super().__init__()
+    self.name = name
+    
+    X_train, X_test, y_train, y_test, scaler = prepare_data(name)
+    self.train = TensorDataset(X_train, y_train)
+    self.X_train = X_train
+    self.y_train = y_train
+    self.test = TensorDataset(X_test, y_test)
+    self.X_test = X_test
+    self.y_test = y_test
+    self.scaler = scaler
 
-  for stock in STOCKS:
-    if(main):
-      print(f"Processing {stock}...")
-    X_train, X_test, y_train, y_test, scaler = prepare_data(stock)
+def get_datasets(verbose=False):
+  datasets = dict[str, Stock]()
 
-    datasets[stock] = {
-      "X_train": X_train,
-      "X_test": X_test,
-      "y_train": y_train,
-      "y_test": y_test,
-      "scaler": scaler
-    }
+  for name in STOCKS:
+    if verbose:
+      print(f"Processing {name}...")
 
-    if(main):
-      print(f"{stock} shapes:")
-      print(f"  X_train: {X_train.shape}")
-      print(f"  X_test : {X_test.shape}")
-      print(f"  y_train: {y_train.shape}")
-      print(f"  y_test : {y_test.shape}")
+    datasets[name] = stock = Stock(name)
+
+    if verbose:
+      print(f"{name} shapes:")
+      print(f"  X_train: {stock.X_train.shape}")
+      print(f"  X_test : {stock.X_test.shape}")
+      print(f"  y_train: {stock.y_train.shape}")
+      print(f"  y_test : {stock.y_test.shape}")
       print("-" * 40)
 
   return datasets
 
 # Not saving in files this time probably better?
 if __name__ == "__main__":
-    main = True
-    datasets = get_datasets()
+    datasets = get_datasets(verbose=True)
     print("Task 1 complete.")

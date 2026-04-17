@@ -1,9 +1,12 @@
 import torch
 import torch.nn as nn
 import time
+from dataclasses import dataclass
+
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, TensorDataset
-from task1 import get_datasets
+from torch.utils.data import DataLoader
+
+from task1 import Stock, get_datasets
 from task2 import RNNModel
 
 """
@@ -27,19 +30,27 @@ def compute_accuracy(y_pred, y_true):
 
   return accuracy.item()
 
-# Training
-def train_model(X_train, y_train, X_test, y_test, stock_name):
+@dataclass
+class TrainResults:
+  train_losses: list[float]
+  test_losses: list[float]
+  time_cost: float
 
-  model = RNNModel(input_size=1, hidden_size=HIDDEN_SIZE, output_size=1)
+  train_loss: float
+  test_loss: float
+  test_accuracy: float
+  test_pred: float
+
+def train_model(model, stock: Stock):
   loss_func = nn.MSELoss()
   optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-  train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
+  train_loader = DataLoader(stock.train, batch_size=BATCH_SIZE, shuffle=True)
 
   train_losses = []
   test_losses = []
 
-  start_time = time.time()
+  start_time = time.perf_counter()
 
   for epoch in range(EPOCHS):
     model.train()
@@ -61,27 +72,30 @@ def train_model(X_train, y_train, X_test, y_test, stock_name):
     # Evaluate
     model.eval()
     with torch.no_grad():
-      test_pred = model(X_test)
-      test_loss = loss_func(test_pred, y_test)
+      test_pred = model(stock.X_test)
+      test_loss = loss_func(test_pred, stock.y_test)
 
     test_losses.append(test_loss.item())
 
-    print(f"{stock_name} | Epoch {epoch+1}/{EPOCHS} | Test Loss: {test_loss.item():.6f}")
+    print(f"{stock.name} | Epoch {epoch+1}/{EPOCHS} | Test Loss: {test_loss.item():.6f}")
 
-  end_time = time.time()
+  end_time = time.perf_counter()
   total_time = end_time - start_time
 
   # Final metrics
   model.eval()
   with torch.no_grad():
-    train_pred = model(X_train)
-    test_pred = model(X_test)
+    train_pred = model(stock.X_train)
+    test_pred = model(stock.X_test)
 
-    train_loss = loss_func(train_pred, y_train).item()
-    test_loss = loss_func(test_pred, y_test).item()
-    test_accuracy = compute_accuracy(test_pred, y_test)
+    train_loss = loss_func(train_pred, stock.y_train).item()
+    test_loss = loss_func(test_pred, stock.y_test).item()
+    test_accuracy = compute_accuracy(test_pred, stock.y_test)
 
-  return model, train_losses, test_losses, train_loss, test_loss, test_accuracy, total_time, test_pred
+  return TrainResults(
+    train_losses, test_losses, total_time,
+    train_loss, test_loss, test_accuracy, test_pred
+  )
 
 # Plotting
 def plot_losses(train_losses, test_losses, stock_name):
@@ -102,39 +116,32 @@ def plot_predictions(y_true, y_pred, stock_name):
   plt.legend()
   plt.savefig("pred_" + stock_name + ".png")
 
-if __name__ == "__main__":
-
+def main():
+  torch.manual_seed(42)
   datasets = get_datasets()
 
   results = {}
 
-  for stock, data in datasets.items():
-    print(f"\nTraining RNN for {stock}...")
+  for name, stock in datasets.items():
+    print(f"\nTraining RNN for {name}...")
 
-    model, train_losses, test_losses, train_loss, test_loss, test_accuracy, time_cost, test_pred = train_model(
-      data["X_train"],
-      data["y_train"],
-      data["X_test"],
-      data["y_test"],
-      stock
-    )
+    model = RNNModel(input_size=1, hidden_size=HIDDEN_SIZE, output_size=1)
+    res = train_model(model, stock)
 
-    results[stock] = {
-      "train_loss": train_loss,
-      "test_loss": test_loss,
-      "accuracy": test_accuracy,
-      "time": time_cost
-    }
+    results[name] = res
 
-    print(f"\n{stock} Results:")
-    print(f"Train Loss: {train_loss:.6f}")
-    print(f"Test Loss : {test_loss:.6f}")
-    print(f"Accuracy  : {test_accuracy*100:.2f}%")
-    print(f"Time      : {time_cost:.2f} seconds")
+    print(f"\n{name} Results:")
+    print(f"Train Loss: {res.train_loss:.6f}")
+    print(f"Test Loss : {res.test_loss:.6f}")
+    print(f"Accuracy  : {res.test_accuracy*100:.2f}%")
+    print(f"Time      : {res.time_cost:.2f} seconds")
 
-    plot_losses(train_losses, test_losses, stock)
-    plot_predictions(data["y_test"], test_pred, stock)
+    plot_losses(res.train_losses, res.test_losses, name)
+    plot_predictions(stock.y_test, res.test_pred, name)
 
   print("\nFinal Summary:")
-  for stock, res in results.items():
-    print(f"{stock}: Accuracy={res['accuracy']*100:.2f}%, Test Loss={res['test_loss']:.6f}")
+  for name, res in results.items():
+    print(f"{name}: Accuracy={res.test_accuracy*100:.2f}%, Test Loss={res.test_loss:.6f}")
+
+if __name__ == "__main__":
+  main()
