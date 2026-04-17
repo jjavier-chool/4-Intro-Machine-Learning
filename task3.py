@@ -41,9 +41,9 @@ class TrainResults:
   test_accuracy: float
   test_pred: float
 
-def train_model(model, stock: Stock):
+def train_model(model, stock: Stock, lr: float):
   loss_func = nn.MSELoss()
-  optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+  optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
   train_loader = DataLoader(stock.train, batch_size=BATCH_SIZE, shuffle=True)
 
@@ -116,8 +116,7 @@ def plot_predictions(y_true, y_pred, stock_name):
   plt.legend()
   plt.savefig("pred_" + stock_name + ".png")
 
-def main():
-  torch.manual_seed(42)
+def train_eval(Model, hidden_size, lr):
   datasets = get_datasets()
 
   results = {}
@@ -125,8 +124,8 @@ def main():
   for name, stock in datasets.items():
     print(f"\nTraining RNN for {name}...")
 
-    model = RNNModel(input_size=1, hidden_size=HIDDEN_SIZE, output_size=1)
-    res = train_model(model, stock)
+    model = Model(input_size=1, hidden_size=hidden_size, output_size=1)
+    res = train_model(model, stock, lr)
 
     results[name] = res
 
@@ -142,6 +141,10 @@ def main():
   print("\nFinal Summary:")
   for name, res in results.items():
     print(f"{name}: Accuracy={res.test_accuracy*100:.2f}%, Test Loss={res.test_loss:.6f}")
+
+def main():
+  torch.manual_seed(42)
+  train_eval(RNNModel, HIDDEN_SIZE, LEARNING_RATE)
 
 if __name__ == "__main__":
   main()
