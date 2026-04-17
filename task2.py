@@ -1,12 +1,12 @@
-import torch
-import torch.nn as nn
-
 """
 Intro Machine Learning Assignment 4
 Encompasses the solution to Task 2.
 Code is adopted and modified from the class slides.
 Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
 """
+import torch
+import torch.nn as nn
+
 class RNNModel(nn.Module):
   def __init__(self, input_size, hidden_size, output_size):
     super(RNNModel, self).__init__()

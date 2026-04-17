@@ -1,3 +1,8 @@
+"""
+Intro to Machine Learning Assignment 4
+Encompasses the solution to Task 3.
+Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
+"""
 import torch
 import torch.nn as nn
 import time
@@ -9,11 +14,6 @@ from torch.utils.data import DataLoader
 from task1 import Stock, get_datasets
 from task2 import RNNModel
 
-"""
-Intro to Machine Learning Assignment 4
-Encompasses the solution to Task 3.
-Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
-"""
 # HYPERPARAMETERS
 BATCH_SIZE = 32
 EPOCHS = 30

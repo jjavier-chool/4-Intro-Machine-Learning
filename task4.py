@@ -1,14 +1,14 @@
+"""
+Intro Machine Learning Assignment 4
+Encompasses the solution to Task 4.
+Code is adopted and modified from the class slides.
+Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
+"""
 import torch
 import torch.nn as nn
 
 from task3 import train_eval
 
-"""
-Intro Machine Learning Assignment 4
-Encompasses the solution to Task 2.
-Code is adopted and modified from the class slides.
-Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
-"""
 LEARNING_RATE = 0.001
 HIDDEN_SIZE = 64
 

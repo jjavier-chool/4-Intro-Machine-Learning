@@ -1,3 +1,8 @@
+"""
+Intro to Machine Learning Assignment 4
+Encompasses the solution to Task 1.
+Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
+"""
 from torch.utils.data import TensorDataset
 import yfinance as yf
 import numpy as np
@@ -5,11 +10,6 @@ import torch
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
-"""
-Intro to Machine Learning Assignment 4
-Encompasses the solution to Task 1.
-Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
-"""
 STOCKS = ["AAPL", "MSFT", "GOOG", "AMZN"]
 # Taken from the suggested dates
 START_DATE = "2018-02-01"
