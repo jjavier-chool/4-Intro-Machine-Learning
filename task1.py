@@ -3,6 +3,7 @@ Intro to Machine Learning Assignment 4
 Encompasses the solution to Task 1.
 Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
 """
+from functools import lru_cache
 from torch.utils.data import TensorDataset
 import yfinance as yf
 import numpy as np
@@ -41,6 +42,7 @@ def create_sequences(data, M: int, N: int):
   return np.array(X), np.array(y)
 
 # Preprocess + split
+@lru_cache
 def prepare_data(stock: str):
   # Download
   raw_data = download_stock_data(stock)

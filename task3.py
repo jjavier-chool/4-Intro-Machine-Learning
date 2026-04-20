@@ -15,10 +15,14 @@ from task1 import Stock, get_datasets
 from task2 import RNN
 
 # HYPERPARAMETERS
+# these are kept the same for consistency
 BATCH_SIZE = 32
-EPOCHS = 30
-LEARNING_RATE = 0.001
-HIDDEN_SIZE = 64
+EPOCHS = 50
+WEIGHT_DECAY = 0.001
+
+# Configurable for task3
+LEARNING_RATE = 0.0005
+HIDDEN_SIZE = 32
 NUM_LAYERS = 1
 
 # Accuracy calc (should be safer?)
@@ -42,9 +46,9 @@ class TrainResults:
   test_accuracy: float
   test_pred: float
 
-def train_model(model, stock: Stock, lr: float):
+def train_model(model, stock: Stock, lr: float, verbose: bool):
   loss_func = nn.MSELoss()
-  optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+  optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=WEIGHT_DECAY)
 
   train_loader = DataLoader(stock.train, batch_size=BATCH_SIZE, shuffle=True)
 
@@ -78,7 +82,8 @@ def train_model(model, stock: Stock, lr: float):
 
     test_losses.append(test_loss.item())
 
-    print(f"{stock.name} | Epoch {epoch+1}/{EPOCHS} | Test Loss: {test_loss.item():.6f}")
+    if verbose:
+      print(f"{stock.name} | Epoch {epoch+1}/{EPOCHS} | Test Loss: {test_loss.item():.6f}")
 
   end_time = time.perf_counter()
   total_time = end_time - start_time
@@ -108,6 +113,7 @@ def plot_losses(train_losses, test_losses, stock_name):
   plt.ylabel("Loss")
   plt.legend()
   plt.savefig("loss_" + stock_name + ".png")
+  plt.close()
 
 def plot_predictions(y_true, y_pred, stock_name):
   plt.figure()
@@ -116,24 +122,28 @@ def plot_predictions(y_true, y_pred, stock_name):
   plt.title(f"Predictions vs True - {stock_name}")
   plt.legend()
   plt.savefig("pred_" + stock_name + ".png")
+  plt.close()
 
 def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
   datasets = get_datasets()
 
   results = {}
 
+  print(f"=== {Model.__name__} ===")
   for name, stock in datasets.items():
-    print(f"\nTraining {type(Model).__name__} for {name}...")
+    if verbose: print()
+    print(f"Training {name}...")
 
     model = Model(input_size=1, hidden_size=hidden_size, num_layers=num_layers, output_size=1)
-    res = train_model(model, stock, lr)
+    res = train_model(model, stock, lr, verbose)
 
     results[name] = res
 
-    print(f"\n{name} Results:")
-    print(f"Train Loss: {res.train_loss:.6f}")
-    print(f"Test Loss : {res.test_loss:.6f}")
-    print(f"Accuracy  : {res.test_accuracy*100:.2f}%")
+    if verbose:
+      print(f"\n{name} Results:")
+      print(f"Train Loss: {res.train_loss:.6f}")
+      print(f"Test Loss : {res.test_loss:.6f}")
+      print(f"Accuracy  : {res.test_accuracy*100:.2f}%")
     print(f"Time      : {res.time_cost:.2f} seconds")
 
     plot_losses(res.train_losses, res.test_losses, name)
@@ -142,6 +152,7 @@ def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
   print("\nFinal Summary:")
   for name, res in results.items():
     print(f"{name}: Accuracy={res.test_accuracy*100:.2f}%, Test Loss={res.test_loss:.6f}")
+  print()
 
 def test(verbose=True):
   train_eval(RNN, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE, verbose=verbose)
