@@ -13,9 +13,9 @@ LEARNING_RATE = 0.001
 HIDDEN_SIZE = 64
 NUM_LAYERS = 1
 
-class LSTMModel(nn.Module):
-  def __init__(self, input_size, hidden_size, output_size, num_layers):
-    super(LSTMModel, self).__init__()
+class LSTM(nn.Module):
+  def __init__(self, input_size, hidden_size, output_size, num_layers=1):
+    super(LSTM, self).__init__()
 
     self.rnn = nn.GRU(input_size, hidden_size, num_layers=num_layers, batch_first=True)
     self.h2o = nn.Linear(hidden_size, output_size)
@@ -27,9 +27,12 @@ class LSTMModel(nn.Module):
     output = self.h2o(output)
     return output
 
+def test(verbose=True):
+  train_eval(LSTM, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE, verbose=verbose)
+
 def main():
   torch.manual_seed(42)
-  train_eval(LSTMModel, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
+  train_eval(LSTM, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
 
 if __name__ == "__main__":
   main()

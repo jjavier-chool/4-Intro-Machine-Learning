@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 
 from task1 import Stock, get_datasets
-from task2 import RNNModel
+from task2 import RNN
 
 # HYPERPARAMETERS
 BATCH_SIZE = 32
@@ -117,13 +117,13 @@ def plot_predictions(y_true, y_pred, stock_name):
   plt.legend()
   plt.savefig("pred_" + stock_name + ".png")
 
-def train_eval(Model, hidden_size, num_layers, lr):
+def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
   datasets = get_datasets()
 
   results = {}
 
   for name, stock in datasets.items():
-    print(f"\nTraining RNN for {name}...")
+    print(f"\nTraining {type(Model).__name__} for {name}...")
 
     model = Model(input_size=1, hidden_size=hidden_size, num_layers=num_layers, output_size=1)
     res = train_model(model, stock, lr)
@@ -143,9 +143,12 @@ def train_eval(Model, hidden_size, num_layers, lr):
   for name, res in results.items():
     print(f"{name}: Accuracy={res.test_accuracy*100:.2f}%, Test Loss={res.test_loss:.6f}")
 
+def test(verbose=True):
+  train_eval(RNN, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE, verbose=verbose)
+
 def main():
   torch.manual_seed(42)
-  train_eval(RNNModel, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
+  test()
 
 if __name__ == "__main__":
   main()

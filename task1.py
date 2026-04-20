@@ -12,8 +12,8 @@ from sklearn.model_selection import train_test_split
 
 STOCKS = ["AAPL", "MSFT", "GOOG", "AMZN"]
 # Taken from the suggested dates
-START_DATE = "2018-02-01"
-END_DATE = "2021-01-31"
+START_DATE = "2010-01-01"
+END_DATE = "2021-12-31"
 
 M = 60  # number of past days (input sequence length)
 N = 1   # number of future days to predict
