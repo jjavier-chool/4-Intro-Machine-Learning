@@ -74,7 +74,7 @@ class Stock:
   def __init__(self, name: str):
     super().__init__()
     self.name = name
-    
+
     X_train, X_test, y_train, y_test, scaler = prepare_data(name)
     self.train = TensorDataset(X_train, y_train)
     self.X_train = X_train

@@ -57,6 +57,7 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
 
   start_time = time.perf_counter()
 
+  # EPOCHS START
   for epoch in range(EPOCHS):
     model.train()
     epoch_loss = 0
@@ -68,13 +69,14 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
       loss = loss_func(outputs, y_batch)
 
       loss.backward()
+      torch.nn.utils.clip_grad_norm_(model.parameters(), 3) #From slides
       optimizer.step()
 
       epoch_loss += loss.item()
 
     train_losses.append(epoch_loss / len(train_loader))
 
-    # Evaluate
+    # Evaluate within epoch
     model.eval()
     with torch.no_grad():
       test_pred = model(stock.X_test)
@@ -88,7 +90,7 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
   end_time = time.perf_counter()
   total_time = end_time - start_time
 
-  # Final metrics
+  # Final metrics after all epochs completed
   model.eval()
   with torch.no_grad():
     train_pred = model(stock.X_train)
@@ -104,7 +106,7 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
   )
 
 # Plotting
-def plot_losses(train_losses, test_losses, stock_name):
+def plot_losses(model_name, train_losses, test_losses, stock_name):
   plt.figure()
   plt.plot(train_losses, label="Train Loss")
   plt.plot(test_losses, label="Test Loss")
@@ -112,18 +114,19 @@ def plot_losses(train_losses, test_losses, stock_name):
   plt.xlabel("Epoch")
   plt.ylabel("Loss")
   plt.legend()
-  plt.savefig("loss_" + stock_name + ".png")
+  plt.savefig(model_name + "/loss_" + stock_name + ".png")
   plt.close()
 
-def plot_predictions(y_true, y_pred, stock_name):
+def plot_predictions(model_name, y_true, y_pred, stock_name):
   plt.figure()
   plt.plot(y_true.numpy(), label="True")
   plt.plot(y_pred.numpy(), label="Predicted")
   plt.title(f"Predictions vs True - {stock_name}")
   plt.legend()
-  plt.savefig("pred_" + stock_name + ".png")
+  plt.savefig(model_name + "/pred_" + stock_name + ".png")
   plt.close()
 
+# Training for each stock with separate models of the given Model type
 def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
   datasets = get_datasets()
 
@@ -146,8 +149,8 @@ def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
       print(f"Accuracy  : {res.test_accuracy*100:.2f}%")
     print(f"Time      : {res.time_cost:.2f} seconds")
 
-    plot_losses(res.train_losses, res.test_losses, name)
-    plot_predictions(stock.y_test, res.test_pred, name)
+    plot_losses(Model.__name__, res.train_losses, res.test_losses, name)
+    plot_predictions(Model.__name__, stock.y_test, res.test_pred, name)
 
   print("\nFinal Summary:")
   for name, res in results.items():

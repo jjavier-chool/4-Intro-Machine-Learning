@@ -23,8 +23,8 @@ class GRU(nn.Module):
 
   def forward(self, line_tensor):
     rnn_out,hidden = self.rnn(line_tensor)
-    output = rnn_out[:, -1, :] # just last time step?
-    output = self.h2o(output)
+    #output = rnn_out[:, -1, :] # just last time step?
+    output = self.h2o(hidden[-1])
     return output
 
 def test(verbose=True):
