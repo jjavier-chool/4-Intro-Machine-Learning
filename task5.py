@@ -78,7 +78,7 @@ def evaluate_model(model, X, y, scaler, device):
         mse = mean_squared_error(y_true, preds)
         rmse = np.sqrt(mse)
 
-        # 🔥 Custom Accuracy (this is what gets you ~95%)
+        
         mean_price = np.mean(y_true)
         accuracy = 1 - (rmse / mean_price)
 
