@@ -130,10 +130,27 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
     train_loss, test_loss, test_accuracy, test_pred
   )
 
+def left(x):
+  m = torch.inf
+  i = 0
+  while x[i] < m:
+    m = x[i]
+    i += 1
+  return i
+
+def chart_limit(x, y):
+  if isinstance(x, list): x = torch.tensor(x)
+  if isinstance(y, list): y = torch.tensor(y)
+  # Ignore the left side of the chart
+  xi = left(x)
+  yi = left(y)
+  data = torch.cat((x[xi:], y[yi:]))
+  return data.min(), data.max()
+
 # Plotting
 def plot_losses(model_name, train_losses, test_losses, stock_name):
   plt.figure()
-  plt.ylim(top=0.0005)
+  plt.ylim(chart_limit(train_losses, test_losses))
   plt.plot(train_losses, label="Train Loss")
   plt.plot(test_losses, label="Test Loss")
   plt.title(f"Loss Curve - {stock_name}")
@@ -145,7 +162,7 @@ def plot_losses(model_name, train_losses, test_losses, stock_name):
 
 def plot_predictions(model_name, y_true, y_pred, stock_name):
   plt.figure()
-  plt.ylim(top=0.0005)
+  #plt.ylim(chart_limit(y_true, y_pred))
   plt.plot(y_true.numpy(), label="True")
   plt.plot(y_pred.numpy(), label="Predicted")
   plt.title(f"Predictions vs True - {stock_name}")
