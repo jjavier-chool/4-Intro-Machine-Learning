@@ -18,13 +18,13 @@ from task2 import RNN
 # HYPERPARAMETERS
 # these are kept the same for consistency
 BATCH_SIZE = 32
-EPOCHS = 200 # Maximum epochs to try
-WEIGHT_DECAY = 0.001
+EPOCHS = 500 # Maximum epochs to try
+WEIGHT_DECAY = 0.0001
 BAD_RUNS = 40 # Number of runs of no improvement to give up
 
 # Configurable for task3
 LEARNING_RATE = 0.0005
-HIDDEN_SIZE = 32
+HIDDEN_SIZE = 64
 NUM_LAYERS = 1
 DROPOUT = 0
 
@@ -157,6 +157,7 @@ def train_eval(Model, lr, verbose=True, **params):
   results = {}
 
   print(f"=== {Model.__name__} ===")
+  print({**params, "lr": lr})
   for name, stock in datasets.items():
     if verbose: print()
     print(f"Training {name}...")
@@ -171,14 +172,15 @@ def train_eval(Model, lr, verbose=True, **params):
       print(f"Train Loss: {res.train_loss:.6f}")
       print(f"Test Loss : {res.test_loss:.6f}")
       print(f"Accuracy  : {res.test_accuracy*100:.2f}%")
-    print(f"Time      : {res.time_cost:.2f} seconds")
+      print(f"Time      : {res.time_cost:.2f} seconds")
 
     plot_losses(Model.__name__, res.train_losses, res.test_losses, name)
     plot_predictions(Model.__name__, stock.y_test, res.test_pred, name)
 
   print("\nFinal Summary:")
+  print("Name | Accuracy | Train loss | Test Loss | Time Cost")
   for name, res in results.items():
-    print(f"{name}: Accuracy={res.test_accuracy*100:.2f}%, Test Loss={res.test_loss:.6f}")
+    print(f"{name:>4} | {res.test_accuracy*100:>7.2f}% | {res.train_loss:>10.6f} | {res.test_loss:>9.6f} | {res.time_cost:>9.2f} sec")
   print()
 
 def test(verbose=True):
