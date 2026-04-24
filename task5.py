@@ -12,12 +12,13 @@ from task3 import train_eval
 LEARNING_RATE = 0.0005
 HIDDEN_SIZE = 64
 NUM_LAYERS = 1
+DROPOUT = 0
 
 class LSTM(nn.Module):
-  def __init__(self, input_size, hidden_size, output_size, num_layers=1):
+  def __init__(self, input_size, hidden_size, output_size, num_layers=1, dropout=0):
     super(LSTM, self).__init__()
 
-    self.rnn = nn.LSTM(input_size, hidden_size, num_layers=num_layers, batch_first=True)
+    self.rnn = nn.LSTM(input_size, hidden_size, num_layers=num_layers, dropout=dropout, batch_first=True)
     self.h2o = nn.Linear(hidden_size, output_size)
     # self.softmax = nn.LogSoftmax(dim=1) ignore for regression
 
@@ -28,11 +29,11 @@ class LSTM(nn.Module):
     return output
 
 def test(verbose=True):
-  train_eval(LSTM, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE, verbose=verbose)
+  train_eval(LSTM, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS, dropout=DROPOUT, lr=LEARNING_RATE, verbose=verbose)
 
 def main():
   torch.manual_seed(42)
-  train_eval(LSTM, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE)
+  test()
 
 if __name__ == "__main__":
   main()

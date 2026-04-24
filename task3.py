@@ -24,6 +24,7 @@ WEIGHT_DECAY = 0.001
 LEARNING_RATE = 0.0005
 HIDDEN_SIZE = 32
 NUM_LAYERS = 1
+DROPOUT = 0
 
 # Accuracy calc (should be safer?)
 def compute_accuracy(y_pred, y_true):
@@ -127,7 +128,7 @@ def plot_predictions(model_name, y_true, y_pred, stock_name):
   plt.close()
 
 # Training for each stock with separate models of the given Model type
-def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
+def train_eval(Model, lr, verbose=True, **params):
   datasets = get_datasets()
 
   results = {}
@@ -137,7 +138,7 @@ def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
     if verbose: print()
     print(f"Training {name}...")
 
-    model = Model(input_size=1, hidden_size=hidden_size, num_layers=num_layers, output_size=1)
+    model = Model(input_size=1, output_size=1, **params)
     res = train_model(model, stock, lr, verbose)
 
     results[name] = res
@@ -158,7 +159,7 @@ def train_eval(Model, hidden_size, num_layers, lr, verbose=True):
   print()
 
 def test(verbose=True):
-  train_eval(RNN, HIDDEN_SIZE, NUM_LAYERS, LEARNING_RATE, verbose=verbose)
+  train_eval(RNN, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS, dropout=DROPOUT, lr=LEARNING_RATE, verbose=verbose)
 
 def main():
   torch.manual_seed(42)
