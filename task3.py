@@ -3,6 +3,7 @@ Intro to Machine Learning Assignment 4
 Encompasses the solution to Task 3.
 Students: Jackie Javier, Pranitha Achanta, Robert McDaniels
 """
+import copy
 import torch
 import torch.nn as nn
 import time
@@ -17,8 +18,9 @@ from task2 import RNN
 # HYPERPARAMETERS
 # these are kept the same for consistency
 BATCH_SIZE = 32
-EPOCHS = 50
+EPOCHS = 100 # Maximum epochs to try
 WEIGHT_DECAY = 0.001
+BAD_RUNS = 20 # Number of runs of no improvement to give up
 
 # Configurable for task3
 LEARNING_RATE = 0.0005
@@ -58,8 +60,15 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
 
   start_time = time.perf_counter()
 
+  best_model = model
+  best_acc = 0
+  best_epoch = 0
+  bad_runs = 0
+
   # EPOCHS START
-  for epoch in range(EPOCHS):
+  epoch = 0
+  while epoch < EPOCHS: #for epoch in range(EPOCHS):
+    epoch += 1
     model.train()
     epoch_loss = 0
 
@@ -87,6 +96,22 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
 
     if verbose:
       print(f"{stock.name} | Epoch {epoch+1}/{EPOCHS} | Test Loss: {test_loss.item():.6f}")
+    
+    test_acc = compute_accuracy(test_pred, stock.y_test)
+    if test_acc > best_acc:
+      best_model = type(model).__new__(type(model))
+      best_model.__dict__ = copy.deepcopy(model.__dict__)
+      best_model.load_state_dict(copy.deepcopy(model.state_dict()))
+      best_acc = test_acc
+      best_epoch = epoch
+      bad_runs = 0
+    elif bad_runs < BAD_RUNS:
+      bad_runs += 1
+    else:
+      break
+  
+  print("Best epoch", best_epoch)
+  model = best_model
 
   end_time = time.perf_counter()
   total_time = end_time - start_time
