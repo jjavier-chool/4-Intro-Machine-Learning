@@ -23,8 +23,8 @@ WEIGHT_DECAY = 0.0001
 BAD_RUNS = 40 # Number of runs of no improvement to give up
 
 # Configurable for task3
-LEARNING_RATE = 0.0005
-HIDDEN_SIZE = 64
+LEARNING_RATE = 0.001
+HIDDEN_SIZE = 72
 NUM_LAYERS = 1
 DROPOUT = 0
 
@@ -43,6 +43,7 @@ class TrainResults:
   train_losses: list[float]
   test_losses: list[float]
   time_cost: float
+  epochs: int
 
   train_loss: float
   test_loss: float
@@ -125,13 +126,14 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
     test_accuracy = compute_accuracy(test_pred, stock.y_test)
 
   return TrainResults(
-    train_losses, test_losses, total_time,
+    train_losses, test_losses, total_time, best_epoch,
     train_loss, test_loss, test_accuracy, test_pred
   )
 
 # Plotting
 def plot_losses(model_name, train_losses, test_losses, stock_name):
   plt.figure()
+  plt.ylim(top=0.0005)
   plt.plot(train_losses, label="Train Loss")
   plt.plot(test_losses, label="Test Loss")
   plt.title(f"Loss Curve - {stock_name}")
@@ -143,6 +145,7 @@ def plot_losses(model_name, train_losses, test_losses, stock_name):
 
 def plot_predictions(model_name, y_true, y_pred, stock_name):
   plt.figure()
+  plt.ylim(top=0.0005)
   plt.plot(y_true.numpy(), label="True")
   plt.plot(y_pred.numpy(), label="Predicted")
   plt.title(f"Predictions vs True - {stock_name}")
@@ -178,9 +181,9 @@ def train_eval(Model, lr, verbose=True, **params):
     plot_predictions(Model.__name__, stock.y_test, res.test_pred, name)
 
   print("\nFinal Summary:")
-  print("Name | Accuracy | Train loss | Test Loss | Time Cost")
+  print("Name | Accuracy | Train loss | Test Loss | Epochs | Time Cost")
   for name, res in results.items():
-    print(f"{name:>4} | {res.test_accuracy*100:>7.2f}% | {res.train_loss:>10.6f} | {res.test_loss:>9.6f} | {res.time_cost:>9.2f} sec")
+    print(f"{name:>4} | {res.test_accuracy*100:>7.2f}% | {res.train_loss:>10.6f} | {res.test_loss:>9.6f} | {res.epochs:>6} | {res.time_cost:>9.2f} sec")
   print()
 
 def test(verbose=True):

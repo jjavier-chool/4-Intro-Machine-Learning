@@ -11,6 +11,13 @@ def main(todo: str='all'):
     if todo == 'all':
         todo = '3,4,5'
     
+    tasks = todo.split(',')
+    if '1' in tasks:
+        print("Task 1 is not executable")
+        return
+    if '2' in tasks:
+        print("Task 2 is not executable")
+
     if todo:
         print(STOCKS, ":", START_DATE, "-", END_DATE)
         print(f'B = {BATCH_SIZE} : E = {EPOCHS} (early {BAD_RUNS}) : λ = {WEIGHT_DECAY}')
@@ -18,16 +25,12 @@ def main(todo: str='all'):
     try:
         for task in todo.split(','):
             {
-                '3': task3,
-                '4': task4,
-                '5': task5
+                '3': task3, 'rnn': task3,
+                '4': task4, 'gru': task4,
+                '5': task5, 'lstm': task5
             }[task].test(verbose=False)
     except KeyError as e:
-        task = e.args[0]
-        if task in {'1', '2'}:
-            print("Task", task, "is not executable")
-        else:
-            print("No task", task)
+        print("No such task", e.args[0])
 
 if __name__ == "__main__":
     import sys

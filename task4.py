@@ -9,8 +9,8 @@ import torch.nn as nn
 
 from task3 import train_eval
 
-LEARNING_RATE = 0.0005
-HIDDEN_SIZE = 64
+LEARNING_RATE = 0.0007
+HIDDEN_SIZE = 72
 NUM_LAYERS = 1
 DROPOUT = 0
 
