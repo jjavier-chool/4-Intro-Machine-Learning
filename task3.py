@@ -18,9 +18,9 @@ from task2 import RNN
 # HYPERPARAMETERS
 # these are kept the same for consistency
 BATCH_SIZE = 32
-EPOCHS = 100 # Maximum epochs to try
+EPOCHS = 200 # Maximum epochs to try
 WEIGHT_DECAY = 0.001
-BAD_RUNS = 20 # Number of runs of no improvement to give up
+BAD_RUNS = 40 # Number of runs of no improvement to give up
 
 # Configurable for task3
 LEARNING_RATE = 0.0005
@@ -66,9 +66,7 @@ def train_model(model, stock: Stock, lr: float, verbose: bool):
   bad_runs = 0
 
   # EPOCHS START
-  epoch = 0
-  while epoch < EPOCHS: #for epoch in range(EPOCHS):
-    epoch += 1
+  for epoch in range(EPOCHS):
     model.train()
     epoch_loss = 0
 
