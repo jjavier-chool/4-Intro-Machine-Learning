@@ -1,12 +1,5 @@
 # 4-Intro-Machine-Learning
-The fourth assignment for CS429.
-
-## TODO:
-- Task 2
-- Task 3: loss figure, time cost of learning, training & test errors
-- Task 4: loss figure, time cost of learning, training & test errors, test accuracy >= 95%.
-- Task 5: loss figure, time cost of learning, training & test errors, test accuracy >= 95%.
-- Report on Overleaf
+The fourth assignment for CS429: Stock Market Prediction using Recurrent Neural Networks.
 
 ## How to Run
 You can run tasks manually using each of:
